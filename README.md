@@ -1,39 +1,90 @@
-**Welcome to your Base44 project** 
+# Cloudera CDP Cluster Designer
 
-**About**
+An interactive React application for designing Cloudera CDP Private Cloud Base clusters.  
+It helps you plan services, capacity, high availability, disk layouts and a rough bill of materials (BOM) for hardware.
 
-View and Edit  your app on [Base44.com](http://Base44.com) 
+## Features
 
-This project contains everything you need to run your app locally.
+- **Cluster configuration panel**
+  - Select CDP services (HDFS, YARN, Hive, Impala, Kafka, Ranger, etc.).
+  - Tune data size, daily ingest growth and compression ratio.
+  - Choose node presets (RAM, cores, disk count/size) and customize disks.
 
-**Edit the code in your local development environment**
+- **Architecture view**
+  - Visual master / utility / gateway / worker / ingest node layout.
+  - Shows total node counts, RAM, cores and cluster tier (small → xxlarge).
 
-Any change pushed to the repo will also be reflected in the Base44 Builder.
+- **Capacity planning**
+  - 1‑year and 5‑year capacity projections based on growth and compression.
+  - Calculates required raw TB and recommended worker counts.
 
-**Prerequisites:** 
+- **High‑availability analysis**
+  - Highlights HA posture of NameNode, YARN, ZooKeeper, JournalNodes, HBase, Kudu, Ranger, NiFi, etc.
+  - Summarizes failure scenarios and expected recovery behaviour.
 
-1. Clone the repository using the project's Git URL 
-2. Navigate to the project directory
-3. Install dependencies: `npm install`
-4. Create an `.env.local` file and set the right environment variables
+- **Disk layout & recommendations**
+  - Per‑node disk layout diagrams for master, utility, worker, gateway and NiFi nodes.
+  - Guidance on JBOD vs RAID, SSD vs HDD/NVMe and mount points.
 
+- **Bill of materials (BOM)**
+  - Approximate hardware BOM with editable unit prices.
+  - CSV export for further analysis.
+
+> This tool is intended as a planning aid, not a substitute for official Cloudera sizing guides or production architecture reviews.
+
+## Tech stack
+
+- **Frontend:** React 18, React Router
+- **UI:** Tailwind CSS, Radix UI primitives, lucide-react icons, framer‑motion
+- **State / data:** React Query, custom hooks and configuration utilities
+- **Tooling:** Vite, ESLint, TypeScript (for type‑checking only)
+
+## Getting started
+
+### Prerequisites
+
+- Node.js 18+ (LTS recommended)
+- npm 9+ or compatible package manager
+
+### Install dependencies
+
+```bash
+npm install
 ```
-VITE_BASE44_APP_ID=your_app_id
-VITE_BASE44_APP_BASE_URL=your_backend_url
 
-e.g.
-VITE_BASE44_APP_ID=cbef744a8545c389ef439ea6
-VITE_BASE44_APP_BASE_URL=https://my-to-do-list-81bfaad7.base44.app
+### Run the app in development
+
+```bash
+npm run dev
 ```
 
-Run the app: `npm run dev`
+Then open the URL printed by Vite (typically `http://localhost:5173/`) in your browser.
 
-**Publish your changes**
+### Production build
 
-Open [Base44.com](http://Base44.com) and click on Publish.
+```bash
+npm run build
+```
 
-**Docs & Support**
+This outputs a production bundle to the `dist/` directory.
 
-Documentation: [https://docs.base44.com/Integrations/Using-GitHub](https://docs.base44.com/Integrations/Using-GitHub)
+### Preview production build locally
 
-Support: [https://app.base44.com/support](https://app.base44.com/support)
+```bash
+npm run preview
+```
+
+## Project structure (high level)
+
+- `src/main.jsx` – Vite entry point; mounts the React app.
+- `src/App.jsx` – Router and top‑level providers.
+- `src/pages/ClusterDesigner.jsx` – Main cluster designer page and tab layout.
+- `src/components/cluster/` – Architecture, capacity, HA, disk layout, BOM and database tabs.
+- `src/lib/clusterConfig.js` – Core sizing logic, presets and recommendations.
+- `src/lib/AuthContext.jsx` – Lightweight auth context used for the local app.
+- `src/api/base44Client.js` – Local stub API returning a fake user.
+
+## Notes
+
+- All numbers and recommendations are approximate and based on public Cloudera documentation and best‑effort modelling.
+- Always validate final designs against Cloudera sizing guides and your organization’s standards before production use.
