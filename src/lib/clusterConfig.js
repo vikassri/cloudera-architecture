@@ -171,8 +171,6 @@ export function generateClusterArchitecture(config) {
     if (enabledIds.has("ozone")) roles.push("Ozone Manager (OM)", "Storage Container Manager (SCM)");
     if (enabledIds.has("csa")) {
       roles.push("Flink Dashboard");
-      roles.push("SQL Stream Builder");
-      roles.push("Materialized View Engine");
     }
     masters.push({ name: "Master Host 1", roles, type: "master", haRole: "standalone" });
   } else if (tier === "medium") {
@@ -185,9 +183,7 @@ export function generateClusterArchitecture(config) {
     if (enabledIds.has("spark")) m3.push("Spark History Server");
     if (enabledIds.has("ozone")) { m1.push("Ozone Manager (OM)"); m2.push("Ozone Manager (OM Standby)"); m3.push("SCM"); }
     if (enabledIds.has("csa")) {
-      m1.push("Flink Dashboard");
-      m1.push("SQL Stream Builder");
-      m1.push("Materialized View Engine");
+      m3.push("Flink Dashboard");
     }
     masters.push(
       { name: "Master Host 1", roles: m1, type: "master", haRole: "active" },
@@ -205,8 +201,6 @@ export function generateClusterArchitecture(config) {
     if (enabledIds.has("ozone")) { m1.push("Ozone Manager (OM)"); m2.push("Ozone Manager (OM)"); m3.push("SCM / Recon"); }
     if (enabledIds.has("csa")) {
       m3.push("Flink Dashboard");
-      m3.push("SQL Stream Builder");
-      m3.push("Materialized View Engine");
     }
     masters.push(
       { name: "Master Host 1", roles: m1, type: "master", haRole: "active" },
@@ -227,8 +221,6 @@ export function generateClusterArchitecture(config) {
     if (enabledIds.has("ozone")) { m1.push("Ozone Manager"); m2.push("Ozone Manager"); m3.push("SCM"); m4.push("Recon"); }
     if (enabledIds.has("csa")) {
       m3.push("Flink Dashboard");
-      m3.push("SQL Stream Builder");
-      m3.push("Materialized View Engine");
     }
     masters.push(
       { name: "Master Host 1", roles: m1, type: "master", haRole: "active" },
