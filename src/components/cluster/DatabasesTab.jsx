@@ -31,6 +31,8 @@ export default function DatabasesTab({ enabledIds = [] }) {
     if (name.includes("hue") && enabledSet.has("hue")) return true;
     if (name.includes("reports")) return true;
     if (name.includes("schema") && enabledSet.has("schema_registry")) return true;
+    if (name.includes("sql stream builder") && enabledSet.has("csa")) return true;
+    if (name.includes("materialized view engine") && enabledSet.has("csa")) return true;
     if (name.includes("streams") && enabledSet.has("smm")) return true;
     if (name.includes("yarn")) return true;
     if (name.includes("kms") && enabledSet.has("ranger")) return true;
@@ -39,6 +41,7 @@ export default function DatabasesTab({ enabledIds = [] }) {
 
   const relevant = DATABASE_REQUIREMENTS.filter(isRelevant);
   const notRelevant = DATABASE_REQUIREMENTS.filter(d => !isRelevant(d));
+
 
   return (
     <ScrollArea className="h-full">
@@ -137,7 +140,6 @@ export default function DatabasesTab({ enabledIds = [] }) {
             </div>
           </div>
         )}
-
         {/* Footer note */}
         <div className="rounded-xl bg-muted/50 p-4 text-[11px] text-muted-foreground space-y-1">
           <p className="font-semibold">MySQL / MariaDB notes:</p>

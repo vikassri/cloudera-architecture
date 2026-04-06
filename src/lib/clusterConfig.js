@@ -22,6 +22,7 @@ export const ALL_SERVICES = [
   { id: "schema_registry", name: "Schema Registry", category: "streaming" },
   { id: "smm", name: "Streams Messaging Manager", category: "streaming" },
   { id: "srm", name: "Streams Replication Manager", category: "streaming" },
+  { id: "csa", name: "Cloudera Streaming Analytics (CSA)", category: "streaming" },
   { id: "cruise_control", name: "Cruise Control", category: "management" },
   { id: "nifi", name: "NiFi (CFM)", category: "ingest" },
   { id: "nifi_registry", name: "NiFi Registry (CFM)", category: "ingest" },
@@ -151,6 +152,11 @@ export function generateClusterArchitecture(config) {
     enabledIds.add("solr");
     enabledIds.add("zookeeper");
   }
+  if (enabledIds.has("csa")) {
+    enabledIds.add("kafka");
+    enabledIds.add("schema_registry");
+    enabledIds.add("zookeeper");
+  }
   if (enabledIds.has("kafka")) enabledIds.add("zookeeper");
 
   const masters = [], utilities = [], gateways = [], workers = [];
@@ -163,6 +169,11 @@ export function generateClusterArchitecture(config) {
     if (enabledIds.has("hbase")) roles.push("HBase Master");
     if (enabledIds.has("schema_registry")) roles.push("Schema Registry");
     if (enabledIds.has("ozone")) roles.push("Ozone Manager (OM)", "Storage Container Manager (SCM)");
+    if (enabledIds.has("csa")) {
+      roles.push("Flink Dashboard");
+      roles.push("SQL Stream Builder");
+      roles.push("Materialized View Engine");
+    }
     masters.push({ name: "Master Host 1", roles, type: "master", haRole: "standalone" });
   } else if (tier === "medium") {
     const m1 = ["NameNode", "JournalNode", "FailoverController", "YARN ResourceManager", "ZooKeeper"];
@@ -173,6 +184,11 @@ export function generateClusterArchitecture(config) {
     if (enabledIds.has("schema_registry")) { m1.push("Schema Registry"); m2.push("Schema Registry"); }
     if (enabledIds.has("spark")) m3.push("Spark History Server");
     if (enabledIds.has("ozone")) { m1.push("Ozone Manager (OM)"); m2.push("Ozone Manager (OM Standby)"); m3.push("SCM"); }
+    if (enabledIds.has("csa")) {
+      m1.push("Flink Dashboard");
+      m1.push("SQL Stream Builder");
+      m1.push("Materialized View Engine");
+    }
     masters.push(
       { name: "Master Host 1", roles: m1, type: "master", haRole: "active" },
       { name: "Master Host 2", roles: m2, type: "master", haRole: "standby" },
@@ -187,6 +203,11 @@ export function generateClusterArchitecture(config) {
     if (enabledIds.has("schema_registry")) { m1.push("Schema Registry"); m2.push("Schema Registry"); }
     if (enabledIds.has("spark")) m3.push("Spark History Server");
     if (enabledIds.has("ozone")) { m1.push("Ozone Manager (OM)"); m2.push("Ozone Manager (OM)"); m3.push("SCM / Recon"); }
+    if (enabledIds.has("csa")) {
+      m3.push("Flink Dashboard");
+      m3.push("SQL Stream Builder");
+      m3.push("Materialized View Engine");
+    }
     masters.push(
       { name: "Master Host 1", roles: m1, type: "master", haRole: "active" },
       { name: "Master Host 2", roles: m2, type: "master", haRole: "standby" },
@@ -204,6 +225,11 @@ export function generateClusterArchitecture(config) {
     if (enabledIds.has("schema_registry")) { m3.push("Schema Registry"); m4.push("Schema Registry"); }
     if (enabledIds.has("spark")) m5.push("Spark History Server");
     if (enabledIds.has("ozone")) { m1.push("Ozone Manager"); m2.push("Ozone Manager"); m3.push("SCM"); m4.push("Recon"); }
+    if (enabledIds.has("csa")) {
+      m3.push("Flink Dashboard");
+      m3.push("SQL Stream Builder");
+      m3.push("Materialized View Engine");
+    }
     masters.push(
       { name: "Master Host 1", roles: m1, type: "master", haRole: "active" },
       { name: "Master Host 2", roles: m2, type: "master", haRole: "standby" },
@@ -227,6 +253,11 @@ export function generateClusterArchitecture(config) {
     if (enabledIds.has("solr")) uR.push("Solr Server (Infra)");
     if (enabledIds.has("smm")) uR.push("Streams Messaging Manager");
     if (enabledIds.has("srm")) uR.push("SRM Service");
+    if (enabledIds.has("csa")) {
+      uR.push("SQL Stream Builder");
+      uR.push("Flink Gateway");
+      uR.push("Materialized View Engine");
+    }
     uR.push("ZooKeeper");
     if (enabledIds.has("knox")) uR.push("Knox Gateway");
     uR.push("Gateway Configuration");
@@ -242,6 +273,10 @@ export function generateClusterArchitecture(config) {
     if (enabledIds.has("solr")) u1.push("Solr Server (Infra)");
     if (enabledIds.has("smm")) u1.push("Streams Messaging Manager");
     if (enabledIds.has("srm")) u1.push("SRM Service");
+    if (enabledIds.has("csa")) {
+      u1.push("SQL Stream Builder");
+      u1.push("Materialized View Engine");
+    }
     if (enabledIds.has("knox")) u1.push("Knox Gateway");
     const u2 = [];
     if (enabledIds.has("hive")) u2.push("Hive Metastore");
@@ -260,6 +295,10 @@ export function generateClusterArchitecture(config) {
     if (enabledIds.has("solr")) u1.push("Solr Server (Infra)");
     if (enabledIds.has("smm")) u1.push("Streams Messaging Manager");
     if (enabledIds.has("srm")) u1.push("SRM Service");
+    if (enabledIds.has("csa")) {
+      u1.push("SQL Stream Builder");
+      u1.push("Materialized View Engine");
+    }
     const u2 = ["CM Management Service"];
     if (enabledIds.has("hive")) u2.push("Hive Metastore");
     if (enabledIds.has("impala")) { u2.push("Impala Catalog Server"); u2.push("Impala StateStore"); }
@@ -274,6 +313,10 @@ export function generateClusterArchitecture(config) {
     if (enabledIds.has("cruise_control")) u1.push("Cruise Control");
     if (enabledIds.has("smm")) u1.push("Streams Messaging Manager");
     if (enabledIds.has("srm")) u1.push("SRM Service");
+    if (enabledIds.has("csa")) {
+      u1.push("SQL Stream Builder");
+      u1.push("Materialized View Engine");
+    }
     const u2 = [];
     if (enabledIds.has("hive")) u2.push("Hive Metastore");
     if (enabledIds.has("impala")) { u2.push("Impala Catalog Server"); u2.push("Impala StateStore"); }
@@ -304,6 +347,7 @@ export function generateClusterArchitecture(config) {
       const gR = ["Gateway Configuration"];
       if (enabledIds.has("hue")) gR.push("Hue");
       if (enabledIds.has("hive")) gR.push("HiveServer2");
+      if (enabledIds.has("csa")) gR.push("Flink Gateway");
       if (i <= 2 && enabledIds.has("knox") && tier !== "medium") gR.push("Knox Gateway");
       gateways.push({ name: `Gateway Host ${i}`, roles: gR, type: "gateway" });
     }
@@ -443,6 +487,22 @@ export const DATABASE_REQUIREMENTS = [
     notes: "Stores schemas, their versions, and branches for Kafka topics.",
     priority: "medium",
     engines: ["PostgreSQL 14+", "MySQL 8.0", "Oracle 19c"],
+  },
+  {
+    service: "SQL Stream Builder",
+    db: "PostgreSQL / MySQL / Oracle",
+    size: "Small",
+    notes: "SQL stream builder metadata, including stream definitions, execution state, and query history.",
+    priority: "medium",
+    engines: ["PostgreSQL 14+", "MySQL 8.0", "Oracle 19c"],
+  },
+  {
+    service: "Materialized View Engine",
+    db: "PostgreSQL / MySQL / Oracle",
+    size: "Small",
+    notes: "Stores table intermediate state for materialized views. Not critical to back up (can be recreated from source data).",
+    priority: "medium",
+    engines: ["PostgreSQL 14+"],
   },
   {
     service: "Streams Messaging Manager (SMM)",
