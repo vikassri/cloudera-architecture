@@ -2,8 +2,9 @@ import React from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
-import { LayoutGrid, HardDrive, AlertCircle, CheckCircle, Info } from "lucide-react";
-import { NODE_PRESETS } from "@/lib/clusterConfig";
+import { LayoutGrid, HardDrive, AlertCircle, CheckCircle, Info, Monitor } from "lucide-react";
+import { NODE_PRESETS, OS_OPTIONS } from "@/lib/clusterConfig";
+
 
 // Disk slot visual component
 function DiskSlot({ disk, index }) {
@@ -138,11 +139,13 @@ export default function NodeDiskLayoutTab({ config, architecture }) {
   const diskTBLabel = diskGB >= 1000 ? `${(diskGB / 1000).toFixed(0)}TB` : `${diskGB}GB`;
   const ha = summary.highAvailability;
   const enabled = new Set(architecture.enabledIds);
+  const os = OS_OPTIONS[config.osVersion || "rhel8"];
+  const defaultFS = os.defaultFS; // use OS default FS for data disks
 
   // ──── MASTER NODE DISK LAYOUT ────
   const masterDisks = [
-    { label: "OS / Root + Swap", type: "SSD", sizeLabel: "480GB", mount: "/  /swap", fs: "xfs" },
-    { label: "OS Mirror (RAID 1 pair)", type: "SSD", sizeLabel: "480GB", mount: "RAID1 pair", fs: "xfs" },
+    { label: "OS / Root + Swap", type: "SSD", sizeLabel: "480GB", mount: "/  /swap", fs: os.defaultFS },
+    { label: "OS Mirror (RAID 1 pair)", type: "SSD", sizeLabel: "480GB", mount: "RAID1 pair", fs: os.defaultFS },
     { label: "NameNode FSImage + Edits", type: "SSD", sizeLabel: "1TB", mount: "/dfs/nn", fs: "xfs" },
     ...(ha ? [{ label: "JournalNode Edits (dedicated)", type: "SSD", sizeLabel: "1TB", mount: "/dfs/jn", fs: "xfs" }] : []),
     ...(enabled.has("zookeeper") ? [{ label: "ZooKeeper Data (dedicated)", type: "SSD", sizeLabel: "500GB", mount: "/var/lib/zookeeper", fs: "xfs" }] : []),
@@ -154,8 +157,8 @@ export default function NodeDiskLayoutTab({ config, architecture }) {
 
   // ──── UTILITY NODE DISK LAYOUT ────
   const utilityDisks = [
-    { label: "OS / Root + Swap", type: "SSD", sizeLabel: "480GB", mount: "/  /swap", fs: "xfs" },
-    { label: "OS Mirror (RAID 1)", type: "SSD", sizeLabel: "480GB", mount: "RAID1 pair", fs: "xfs" },
+    { label: "OS / Root + Swap", type: "SSD", sizeLabel: "480GB", mount: "/  /swap", fs: os.defaultFS },
+    { label: "OS Mirror (RAID 1)", type: "SSD", sizeLabel: "480GB", mount: "RAID1 pair", fs: os.defaultFS },
     { label: "Cloudera Manager DB / Logs", type: "SSD", sizeLabel: "1TB", mount: "/var/lib/cloudera-scm-server", fs: "xfs" },
     { label: "CM Heap & Temp", type: "SSD", sizeLabel: "500GB", mount: "/tmp  /opt/cloudera", fs: "xfs" },
     ...(enabled.has("hive") ? [{ label: "Hive Metastore Scratch", type: "SSD", sizeLabel: "500GB", mount: "/var/lib/hive", fs: "xfs" }] : []),
@@ -163,8 +166,8 @@ export default function NodeDiskLayoutTab({ config, architecture }) {
 
   // ──── WORKER NODE DISK LAYOUT ────
   const workerDisks = [
-    { label: "OS / Root + Swap", type: "SSD", sizeLabel: "480GB", mount: "/  /swap", fs: "xfs" },
-    { label: "OS Mirror (RAID 1)", type: "SSD", sizeLabel: "480GB", mount: "RAID1 pair", fs: "xfs" },
+    { label: "OS / Root + Swap", type: "SSD", sizeLabel: "480GB", mount: "/  /swap", fs: os.defaultFS},
+    { label: "OS Mirror (RAID 1)", type: "SSD", sizeLabel: "480GB", mount: "RAID1 pair", fs: os.defaultFS },
     ...(enabled.has("kudu") ? [{ label: "Kudu Tablet WAL (dedicated SSD)", type: "SSD", sizeLabel: "500GB", mount: "/data/kudu-wal", fs: "xfs" }] : []),
     ...Array.from({ length: diskCount }, (_, i) => ({
       label: `HDFS Data Disk ${i + 1}${enabled.has("kudu") ? " + Kudu Data" : ""}`,
@@ -177,15 +180,15 @@ export default function NodeDiskLayoutTab({ config, architecture }) {
 
   // ──── GATEWAY NODE DISK LAYOUT ────
   const gatewayDisks = [
-    { label: "OS / Root + Swap", type: "SSD", sizeLabel: "480GB", mount: "/  /swap", fs: "xfs" },
-    { label: "OS Mirror (RAID 1)", type: "SSD", sizeLabel: "480GB", mount: "RAID1 pair", fs: "xfs" },
+    { label: "OS / Root + Swap", type: "SSD", sizeLabel: "480GB", mount: "/  /swap", fs: os.defaultFS },
+    { label: "OS Mirror (RAID 1)", type: "SSD", sizeLabel: "480GB", mount: "RAID1 pair", fs: os.defaultFS},
     { label: "Hue / Knox Logs & Scratch", type: "SSD", sizeLabel: "500GB", mount: "/var/log  /tmp", fs: "xfs" },
   ];
 
   // ──── CFM / NIFI NODE DISK LAYOUT ────
   const nifiDisks = enabled.has("nifi") ? [
-    { label: "OS / Root + Swap", type: "SSD", sizeLabel: "480GB", mount: "/  /swap", fs: "xfs" },
-    { label: "OS Mirror (RAID 1)", type: "SSD", sizeLabel: "480GB", mount: "RAID1 pair", fs: "xfs" },
+    { label: "OS / Root + Swap", type: "SSD", sizeLabel: "480GB", mount: "/  /swap", fs: os.defaultFS},
+    { label: "OS Mirror (RAID 1)", type: "SSD", sizeLabel: "480GB", mount: "RAID1 pair", fs: os.defaultFS },
     { label: "NiFi Content Repository", type: "SSD", sizeLabel: "1TB", mount: "/data/nifi/content", fs: "xfs" },
     { label: "NiFi FlowFile Repository", type: "SSD", sizeLabel: "500GB", mount: "/data/nifi/flowfile", fs: "xfs" },
     { label: "NiFi Provenance Repository 1", type: "HDD", sizeLabel: "4TB", mount: "/data/nifi/provenance/1", fs: "xfs" },
@@ -272,7 +275,30 @@ export default function NodeDiskLayoutTab({ config, architecture }) {
             Per-node disk layout based on Cloudera CDP Reference Architecture. Worker preset: <span className="font-mono font-semibold">{preset.label}</span>
           </p>
         </div>
-
+              {/* OS Summary Banner */}
+        <div className={`rounded-xl border ${os.border} ${os.bg} p-4`}>
+          <div className="flex items-start gap-3">
+            <Monitor className={`w-5 h-5 mt-0.5 flex-shrink-0 ${os.color}`} />
+            <div className="flex-1 min-w-0">
+              <p className={`text-sm font-bold ${os.color}`}>{os.label}</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">{os.notes}</p>
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 mt-2">
+                {[
+                  { k: "Kernel", v: os.kernel },
+                  { k: "Package Mgr", v: os.pkgMgr },
+                  { k: "Default FS", v: os.defaultFS },
+                  { k: "Java", v: os.javaVersion },
+                  { k: "Python", v: os.PythonVersion },
+                ].map(({ k, v }) => (
+                  <div key={k} className="rounded-lg bg-background/60 border border-border px-2 py-1">
+                    <p className="text-[9px] text-muted-foreground">{k}</p>
+                    <p className={`text-xs font-mono font-bold ${os.color}`}>{v}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
         {/* Key principles banner */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {[

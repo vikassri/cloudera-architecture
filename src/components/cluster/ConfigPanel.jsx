@@ -7,10 +7,10 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { ALL_SERVICES, SERVICE_CATEGORIES, NODE_PRESETS, EC_POLICIES } from "@/lib/clusterConfig";
+import { ALL_SERVICES, SERVICE_CATEGORIES, NODE_PRESETS, EC_POLICIES, OS_OPTIONS } from "@/lib/clusterConfig";
 import {
-  Server, HardDrive, Database,
-  ShieldCheck, Settings2, ChevronDown, ChevronRight, Disc, TrendingUp, Layers
+  Server, HardDrive, Cpu, Database,
+  ShieldCheck, Settings2, ChevronDown, ChevronRight, Disc, TrendingUp, Layers, Monitor
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -199,6 +199,48 @@ export default function ConfigPanel({ config, onChange }) {
                 {preset?.diskType || "HDD"}
               </span>
               <span>{preset?.network || "10GbE"} Network</span>
+            </div>
+            {/* OS Selection */}
+            <div className="space-y-1.5">
+              <Label className="text-xs flex items-center gap-1.5">
+                <Monitor className="w-3 h-3 text-muted-foreground" /> Operating System
+              </Label>
+              <Select value={config.osVersion || "rhel8"}
+                onValueChange={v => onChange({ ...config, osVersion: v })}>
+                <SelectTrigger className="h-8 text-[11px]"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {Object.entries(OS_OPTIONS).map(([k, v]) => (
+                    <SelectItem key={k} value={k} className="text-[11px]">{v.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {(() => {
+                const os = OS_OPTIONS[config.osVersion || "rhel8"];
+                return (
+                  <div className={`rounded-lg ${os.bg} border ${os.border} p-2 text-[10px] space-y-0.5`}>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Kernel</span>
+                      <span className={`font-mono font-bold ${os.color}`}>{os.kernel}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Package Mgr</span>
+                      <span className={`font-mono font-bold ${os.color}`}>{os.pkgMgr}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Default FS</span>
+                      <span className={`font-mono font-bold ${os.color}`}>{os.defaultFS}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Java</span>
+                      <span className={`font-mono font-bold ${os.color}`}>{os.javaVersion}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Python</span>
+                      <span className={`font-mono font-bold ${os.color}`}>{os.PythonVersion}</span>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
 
             {/* HA Toggle */}
