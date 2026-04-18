@@ -8,6 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { ALL_SERVICES, SERVICE_CATEGORIES, NODE_PRESETS, EC_POLICIES, OS_OPTIONS } from "@/lib/clusterConfig";
+import ThemeToggle from "@/components/ThemeToggle";
 import {
   Server, HardDrive, Cpu, Database,
   ShieldCheck, Settings2, ChevronDown, ChevronRight, Disc, TrendingUp, Layers, Monitor
@@ -54,14 +55,17 @@ export default function ConfigPanel({ config, onChange }) {
   return (
     <div className="w-full h-full flex flex-col bg-card border-r border-border">
       <div className="p-4 border-b border-border">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-            <Settings2 className="w-4 h-4 text-primary" />
+        <div className="flex items-center justify-between gap-2.5">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Settings2 className="w-4 h-4 text-primary" />
+            </div>
+            <div>
+              <h2 className="font-semibold text-sm text-foreground">Cluster Configuration</h2>
+              <p className="text-[11px] text-muted-foreground">CDP Private Cloud Base 7.3</p>
+            </div>
           </div>
-          <div>
-            <h2 className="font-semibold text-sm text-foreground">Cluster Configuration</h2>
-            <p className="text-[11px] text-muted-foreground">CDP Private Cloud Base 7.3</p>
-          </div>
+          <ThemeToggle />
         </div>
       </div>
 

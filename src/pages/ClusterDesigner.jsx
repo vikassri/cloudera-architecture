@@ -46,6 +46,26 @@ const TABS = [
 export default function ClusterDesigner() {
   const [config, setConfig] = useState(DEFAULT_CONFIG);
   const [activeTab, setActiveTab] = useState("architecture");
+  const [panelWidth, setPanelWidth] = useState(340);
+  const [isResizing, setIsResizing] = useState(false);
+
+  const handleMouseDown = () => {
+    setIsResizing(true);
+  };
+
+  const handleMouseUp = () => {
+    setIsResizing(false);
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isResizing) return;
+    
+    const newWidth = e.clientX;
+    // Constrain width between 250px and 600px
+    if (newWidth > 250 && newWidth < 600) {
+      setPanelWidth(newWidth);
+    }
+  };
 
   // Auto-derive workerCount from 1Y capacity plan
   const capacityPlan = useMemo(() => computeCapacityPlan(config), [config]);
@@ -60,11 +80,27 @@ export default function ClusterDesigner() {
   }, [effectiveConfig, capacityPlan.plan1Y]);
 
   return (
-    <div className="h-screen flex bg-background overflow-hidden font-inter">
+    <div
+      className="h-screen flex bg-background overflow-hidden font-inter"
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
+    >
       {/* Desktop Sidebar */}
-      <div className="hidden lg:block w-80 xl:w-88 flex-shrink-0 border-r border-border overflow-hidden" style={{ width: "340px" }}>
+      <div
+        className="hidden lg:flex flex-shrink-0 border-r border-border overflow-hidden"
+        style={{ width: `${panelWidth}px` }}
+      >
         <ConfigPanel config={config} onChange={setConfig} />
       </div>
+
+      {/* Resizable Divider */}
+      <div
+        className={`hidden lg:block w-1 hover:bg-primary/30 ${
+          isResizing ? "bg-primary" : "bg-border"
+        } transition-colors cursor-col-resize`}
+        onMouseDown={handleMouseDown}
+      />
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
